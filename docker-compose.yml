@@ -1,0 +1,64 @@
+name: warp-server-mod
+
+services:
+  api:
+    build: .
+    command: /server
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/data
+    environment:
+      - DB_PATH=/data/warp.db
+      - MAX_ENDPOINTS=1000
+    restart: unless-stopped
+
+  ui:
+    build: .
+    command: /ui
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./img:/img
+    environment:
+      - API_ADDR=http://api:8080
+      - UI_ADDR=:8081
+      - BG_CACHE_DIR=/img
+      - UNSPLASH_ACCESS_KEY=cjjFLji7SSrb6iQ01Et3Z9iHFq9CmSosMQkl1lK3Ha4
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  worker-register:
+    build: .
+    command: /worker register
+    volumes:
+      - ./data:/data
+    environment:
+      - DB_PATH=/data/warp.db
+      - TARGET_COUNT=10
+      - INTERVAL=5m
+      - MAX_ENDPOINTS=1000
+    restart: unless-stopped
+
+  worker-scanner:
+    build: .
+    command: /worker scan
+    volumes:
+      - ./data:/data
+    environment:
+      - DB_PATH=/data/warp.db
+      - INTERVAL=10m
+      - MAX_ENDPOINTS=1000
+    restart: unless-stopped
+
+  worker-prober:
+    build: .
+    command: /worker probe
+    volumes:
+      - ./data:/data
+    environment:
+      - DB_PATH=/data/warp.db
+      - INTERVAL=2m
+      - MAX_ENDPOINTS=1000
+    restart: unless-stopped

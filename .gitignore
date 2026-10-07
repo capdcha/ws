@@ -1,0 +1,15 @@
+data/
+
+# Compiled binaries
+/server
+/worker
+/wgprobe
+
+# SQLite database and WAL/SHM
+warp.db
+warp.db-shm
+warp.db-wal
+
+# Generated WARP configs
+warp.conf
+
