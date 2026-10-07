@@ -1,5 +1,8 @@
 data/
 
+# Cached Unsplash background pictures
+img/
+
 # Compiled binaries
 /server
 /worker
