@@ -4,7 +4,8 @@ services:
   api:
     build: .
     command: /server
-    network_mode: host
+    ports:
+      - "8080:8080"
     volumes:
       - ./data:/data
     environment:
@@ -15,11 +16,12 @@ services:
   ui:
     build: .
     command: /ui
-    network_mode: host
+    ports:
+      - "8081:8081"
     volumes:
       - ./img:/img
     environment:
-      - API_ADDR=http://127.0.0.1:8080
+      - API_ADDR=http://api:8080
       - UI_ADDR=:8081
       - BG_CACHE_DIR=/img
       - UNSPLASH_ACCESS_KEY=cjjFLji7SSrb6iQ01Et3Z9iHFq9CmSosMQkl1lK3Ha4
@@ -30,7 +32,6 @@ services:
   worker-register:
     build: .
     command: /worker register
-    network_mode: host
     volumes:
       - ./data:/data
     environment:
@@ -43,7 +44,6 @@ services:
   worker-scanner:
     build: .
     command: /worker scan
-    network_mode: host
     volumes:
       - ./data:/data
     environment:
@@ -55,7 +55,6 @@ services:
   worker-prober:
     build: .
     command: /worker probe
-    network_mode: host
     volumes:
       - ./data:/data
     environment:
