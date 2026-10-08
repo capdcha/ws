@@ -2,35 +2,46 @@ name: warp-server-mod
 
 services:
   api:
-    build: .
-    command: /server
+    build:
+      context: .
+      network: host
     network_mode: host
+    command: ["/server"] # Явно задаем в виде массива, чтобы Compose не путал кэш
     volumes:
       - ./data:/data
     environment:
       - DB_PATH=/data/warp.db
       - MAX_ENDPOINTS=1000
+      - TRUSTED_CIDRS=0.0.0.0/0
+      - GODEBUG=netdns=cgo # Форсируем системный DNS
     restart: unless-stopped
 
   ui:
-    build: .
-    command: /ui
+    build:
+      context: .
+      network: host
     network_mode: host
+    command: ["/ui"]
     volumes:
       - ./img:/img
+    extra_hosts:
+      - "api:127.0.0.1"
     environment:
-      - API_ADDR=http://127.0.0.1:8080
+      - API_ADDR=http://api:8080
       - UI_ADDR=:8081
       - BG_CACHE_DIR=/img
       - UNSPLASH_ACCESS_KEY=cjjFLji7SSrb6iQ01Et3Z9iHFq9CmSosMQkl1lK3Ha4
+      - GODEBUG=netdns=cgo
     depends_on:
       - api
     restart: unless-stopped
 
   worker-register:
-    build: .
-    command: /worker register
+    build:
+      context: .
+      network: host
     network_mode: host
+    command: ["/worker", "register"]
     volumes:
       - ./data:/data
     environment:
@@ -38,28 +49,35 @@ services:
       - TARGET_COUNT=10
       - INTERVAL=5m
       - MAX_ENDPOINTS=1000
+      - GODEBUG=netdns=cgo
     restart: unless-stopped
 
   worker-scanner:
-    build: .
-    command: /worker scan
+    build:
+      context: .
+      network: host
     network_mode: host
+    command: ["/worker", "scan"]
     volumes:
       - ./data:/data
     environment:
       - DB_PATH=/data/warp.db
       - INTERVAL=10m
       - MAX_ENDPOINTS=1000
+      - GODEBUG=netdns=cgo
     restart: unless-stopped
 
   worker-prober:
-    build: .
-    command: /worker probe
+    build:
+      context: .
+      network: host
     network_mode: host
+    command: ["/worker", "probe"]
     volumes:
       - ./data:/data
     environment:
       - DB_PATH=/data/warp.db
       - INTERVAL=2m
       - MAX_ENDPOINTS=1000
+      - GODEBUG=netdns=cgo
     restart: unless-stopped

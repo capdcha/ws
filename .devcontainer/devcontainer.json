@@ -1,0 +1,16 @@
+{
+  "name": "Warp Server",
+  "forwardPorts":,
+  "portsAttributes": {
+    "8080": {
+      "label": "API Port",
+      "onAutoForward": "notify",
+      "visibility": "public"
+    },
+    "8081": {
+      "label": "UI Port",
+      "onAutoForward": "openBrowser",
+      "visibility": "public"
+    }
+  }
+}
